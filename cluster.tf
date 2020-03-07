@@ -1,82 +1,44 @@
-data "template_file" "k8s-server-setup" {
-    template = "${file("${path.module}/scripts/master_install.sh")}"
-
-    vars = {
-
-    }
-}
-
-data "template_file" "k8s-worker-1-setup" {
-    template = "${file("${path.module}/scripts/worker_install.sh")}"
-
-    vars = {
-        NODE_ID = "1"
-    }
-}
-
-data "template_file" "k8s-worker-2-setup" {
-    template = "${file("${path.module}/scripts/worker_install.sh")}"
-
-    vars = {
-        NODE_ID = "2"
-    }
-}
-
 resource "aws_instance" "k8s-master" {
-    ami = "${data.aws_ami.ubuntu.id}"
-    instance_type = "${var.instance_size}"
-    key_name = "${var.key_pair}"
-    vpc_security_group_ids = ["${aws_security_group.k8s-server-sg.id}"]
-    user_data = "${data.template_file.k8s-server-setup.rendered}"
-    subnet_id = "${aws_subnet.public-subnet.id}"
-    iam_instance_profile = "${aws_iam_instance_profile.k8s-main-profile.id}"
+    ami = data.aws_ami.ubuntu.id
+    instance_type = var.instance_size
+    key_name = var.key_pair
+    vpc_security_group_ids = [aws_security_group.k8s-server-sg.id]
+    user_data = templatefile("${path.module}/scripts/master_install.sh", {})
+    subnet_id = aws_subnet.public-subnet.id
+    iam_instance_profile = aws_iam_instance_profile.k8s-main-profile.id
     private_ip = "10.0.1.10"
 
     tags = {
         Name = "k8s-server-${var.unit_prefix}"
         # TTL = "-1"
-        owner = "kcochran@hashicorp.com"
+        owner = var.owner_email
     }
 }
 
-resource "aws_instance" "k8s-worker-1" {
-    ami = "${data.aws_ami.ubuntu.id}"
-    instance_type = "${var.instance_size}"
-    key_name = "${var.key_pair}"
-    vpc_security_group_ids = ["${aws_security_group.k8s-node-sg.id}"]
-    user_data = "${data.template_file.k8s-worker-1-setup.rendered}"
-    subnet_id = "${aws_subnet.public-subnet.id}"
-    iam_instance_profile = "${aws_iam_instance_profile.k8s-main-profile.id}"
-    private_ip = "10.0.1.20"
+resource "aws_instance" "k8s-worker" {
+    count = var.num_worker_nodes
+    ami = data.aws_ami.ubuntu.id
+    instance_type = var.instance_size
+    key_name = var.key_pair
+    vpc_security_group_ids = [aws_security_group.k8s-node-sg.id]
+    user_data = templatefile("${path.module}/scripts/worker_install.sh", {
+        NODE_ID = count.index + 1
+    })
+    subnet_id = aws_subnet.public-subnet.id
+    iam_instance_profile = aws_iam_instance_profile.k8s-main-profile.id
+    private_ip = "10.0.1.${count.index + 100}"
 
     tags = {
-        Name = "k8s-server-${var.unit_prefix}"
+        Name = "k8s-worker-${var.unit_prefix}-${count.index + 1}"
         # TTL = "-1"
-        owner = "kcochran@hashicorp.com"
-    }
-}
-
-resource "aws_instance" "k8s-worker-2" {
-    ami = "${data.aws_ami.ubuntu.id}"
-    instance_type = "${var.instance_size}"
-    key_name = "${var.key_pair}"
-    vpc_security_group_ids = ["${aws_security_group.k8s-node-sg.id}"]
-    user_data = "${data.template_file.k8s-worker-2-setup.rendered}"
-    subnet_id = "${aws_subnet.public-subnet.id}"
-    iam_instance_profile = "${aws_iam_instance_profile.k8s-main-profile.id}"
-    private_ip = "10.0.1.40"
-
-    tags = {
-        Name = "k8s-server-${var.unit_prefix}"
-        # TTL = "-1"
-        owner = "kcochran@hashicorp.com"
+        owner = var.owner_email
     }
 }
 
 resource "aws_security_group" "k8s-node-sg" {
     name = "k8s-node-sg-${var.unit_prefix}"
     description = "webserver security group"
-    vpc_id = "${aws_vpc.primary-vpc.id}"
+    vpc_id = aws_vpc.primary-vpc.id
 
     ingress {
         from_port = 22
@@ -103,7 +65,7 @@ resource "aws_security_group" "k8s-node-sg" {
 resource "aws_security_group" "k8s-server-sg" {
     name = "k8s-server-sg-${var.unit_prefix}"
     description = "webserver security group"
-    vpc_id = "${aws_vpc.primary-vpc.id}"
+    vpc_id = aws_vpc.primary-vpc.id
 
     ingress {
         from_port = 22
@@ -190,22 +152,22 @@ data "aws_iam_policy_document" "k8s-main-tag-doc" {
 
 resource "aws_iam_role" "k8s-main-access-role" {
   name               = "k8s-access-role-${var.unit_prefix}"
-  assume_role_policy = "${data.aws_iam_policy_document.k8s-assume-role.json}"
+  assume_role_policy = data.aws_iam_policy_document.k8s-assume-role.json
 }
 
 resource "aws_iam_role_policy" "k8s-main-access-policy-1" {
   name   = "k8s-access-policy-${var.unit_prefix}"
-  role   = "${aws_iam_role.k8s-main-access-role.id}"
-  policy = "${data.aws_iam_policy_document.k8s-main-access-doc.json}"
+  role   = aws_iam_role.k8s-main-access-role.id
+  policy = data.aws_iam_policy_document.k8s-main-access-doc.json
 }
 
 resource "aws_iam_role_policy" "k8s-main-access-policy-2" {
   name   = "k8s-access-policy-${var.unit_prefix}"
-  role   = "${aws_iam_role.k8s-main-access-role.id}"
-  policy = "${data.aws_iam_policy_document.k8s-main-tag-doc.json}"
+  role   = aws_iam_role.k8s-main-access-role.id
+  policy = data.aws_iam_policy_document.k8s-main-tag-doc.json
 }
 
 resource "aws_iam_instance_profile" "k8s-main-profile" {
   name = "k8s-access-profile-${var.unit_prefix}"
-  role = "${aws_iam_role.k8s-main-access-role.name}"
+  role = aws_iam_role.k8s-main-access-role.name
 }

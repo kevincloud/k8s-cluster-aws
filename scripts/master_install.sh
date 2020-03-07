@@ -58,10 +58,12 @@ echo "export KUBECONFIG=/etc/kubernetes/admin.conf" >> /root/.profile
 
 mkdir -p /etc/cni/net.d
 mkdir -p /opt/cni/bin
-kubectl apply -f https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/release-1.6/config/v1.6/aws-k8s-cni.yaml
+sysctl net.bridge.bridge-nf-call-iptables=1
+#kubectl apply -f https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/release-1.5.5/config/v1.5/aws-k8s-cni.yaml
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 
-while [[ ! -z $(kubectl get pods --all-namespaces | sed -n '/Running/ !p' | sed -n '/NAMESPACE/ !p') ]]; do
-    sleep 1
+while [[ ! -z $(kubectl get pods --all-namespaces | sed -n '1d; /Running/ !p') ]]; do
+    sleep 5
 done
 
 sudo bash -c "cat >/root/ready.py" <<EOT

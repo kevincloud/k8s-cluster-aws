@@ -12,3 +12,6 @@ variable "unit_prefix" { }
 
 variable "instance_size" { }
 
+variable "num_worker_nodes" { }
+
+variable "owner_email" { }
