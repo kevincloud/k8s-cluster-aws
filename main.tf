@@ -26,7 +26,7 @@ resource "aws_subnet" "public-subnet" {
     cidr_block = "10.0.1.0/24"
     availability_zone = "${var.aws_region}a"
     map_public_ip_on_launch = true
-    depends_on = ["aws_internet_gateway.igw"]
+    depends_on = [aws_internet_gateway.igw]
 
     tags = {
         Name = "k8s-public-subnet-1-${var.unit_prefix}"
@@ -70,7 +70,7 @@ resource "aws_eip" "nat-ip" {
 resource "aws_nat_gateway" "natgw" {
     allocation_id   = aws_eip.nat-ip.id
     subnet_id       = aws_subnet.public-subnet.id
-    depends_on      = ["aws_internet_gateway.igw","aws_subnet.public-subnet"]
+    depends_on      = [aws_internet_gateway.igw, aws_subnet.public-subnet]
 
     tags = {
         Name = "k8s-natgw-${var.unit_prefix}"
@@ -81,7 +81,7 @@ resource "aws_route_table" "natgw-route" {
     vpc_id = aws_vpc.primary-vpc.id
     route {
         cidr_block = "0.0.0.0/0"
-        nat_gateway_id = "${aws_nat_gateway.natgw.id}"
+        nat_gateway_id = aws_nat_gateway.natgw.id
     }
 
     tags = {
