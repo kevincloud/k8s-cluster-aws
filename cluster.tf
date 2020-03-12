@@ -48,6 +48,20 @@ resource "aws_security_group" "k8s-node-sg" {
     }
 
     ingress {
+        from_port = 6783
+        to_port = 6783
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 10250
+        to_port = 10250
+        protocol = "tcp"
+        cidr_blocks = ["10.0.1.0/24"]
+    }
+
+    ingress {
         from_port = 30000
         to_port = 32767
         protocol = "tcp"
@@ -75,24 +89,38 @@ resource "aws_security_group" "k8s-server-sg" {
     }
 
     ingress {
-        from_port = 80
-        to_port = 80
+        from_port = 2379
+        to_port = 2380
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.1.0/24"]
     }
 
     ingress {
         from_port = 5000
         to_port = 5000
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.1.0/24"]
     }
 
     ingress {
         from_port = 6443
         to_port = 6443
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.1.0/24"]
+    }
+
+    ingress {
+        from_port = 6783
+        to_port = 6783
+        protocol = "tcp"
+        cidr_blocks = ["10.0.1.0/24"]
+    }
+
+    ingress {
+        from_port = 10250
+        to_port = 10252
+        protocol = "tcp"
+        cidr_blocks = ["10.0.1.0/24"]
     }
 
     egress {

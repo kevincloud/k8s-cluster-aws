@@ -36,6 +36,12 @@ echo "k8s-worker-${NODE_ID}" > /etc/hostname
 echo "$CLIENT_IP k8s-worker-${NODE_ID}" >> /etc/hosts
 hostnamectl set-hostname k8s-worker-${NODE_ID}
 
+# mkdir -p $HOME/.kube
+# sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+# sudo chown $(id -u):$(id -g) $HOME/.kube/config
+# export KUBECONFIG=$HOME/.kube/config
+# export KUBECONFIG=$HOME/.kube/config | tee -a ~/.bashrc
+
 curl -s http://10.0.1.10:5000/ > /root/ready.sh
 while [ ! -s "/root/ready.sh" ]; do
     sleep 1
