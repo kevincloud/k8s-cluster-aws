@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: mycoolapp-rs
+    labels:
+        app: mycoolapp
+spec:
+    template:
+        metadata:
+            name: coolapp-pod
+            labels:
+                app: coolapp
+        spec:
+            containers:
+                - name: nginx-containers
+                  image: nginx
+    replicas: 3
+    selector: 
+        matchLabels:
+            app: coolapp
