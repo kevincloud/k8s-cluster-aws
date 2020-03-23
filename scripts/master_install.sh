@@ -6,10 +6,10 @@ echo "Pre-installation tasks..."
 # Install OS updates
 # 
 echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
-echo 'grub-pc grub-pc/install_devices_empty boolean true' | sudo debconf-set-selections
-echo 'grub-pc grub-pc/linux_cmdline seen true' | sudo debconf-set-selections
-sudo apt-get remove -y grub
-sudo apt-get install -y grub
+# echo 'grub-pc grub-pc/install_devices_empty boolean true' | sudo debconf-set-selections
+# echo 'grub-pc grub-pc/linux_cmdline seen true' | sudo debconf-set-selections
+# sudo apt-get remove -y grub
+# sudo apt-get install -y grub
 export DEBIAN_FRONTEND=noninteractive
 echo "...installing Ubuntu updates"
 
@@ -24,7 +24,7 @@ deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 
 sudo apt-get -y update
-sudo apt-get -y upgrade
+# sudo apt-get -y upgrade
 
 sudo apt-get install -y \
     apt-transport-https \
