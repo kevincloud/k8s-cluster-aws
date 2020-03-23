@@ -8,6 +8,8 @@ echo "Pre-installation tasks..."
 echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
 echo 'grub-pc grub-pc/install_devices_empty boolean true' | sudo debconf-set-selections
 echo 'grub-pc grub-pc/linux_cmdline seen true' | sudo debconf-set-selections
+sudo apt-get remove -y grub
+sudo apt-get install -y grub
 export DEBIAN_FRONTEND=noninteractive
 echo "...installing Ubuntu updates"
 
