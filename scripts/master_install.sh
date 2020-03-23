@@ -59,7 +59,6 @@ echo "export KUBECONFIG=/etc/kubernetes/admin.conf" >> /root/.profile
 mkdir -p /etc/cni/net.d
 mkdir -p /opt/cni/bin
 sysctl net.bridge.bridge-nf-call-iptables=1
-#kubectl apply -f https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/release-1.5.5/config/v1.5/aws-k8s-cni.yaml
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 
 while [[ ! -z $(kubectl get pods --all-namespaces | sed -n '1d; /Running/ !p') ]]; do
@@ -79,3 +78,25 @@ if __name__ == '__main__':
 EOT
 
 python3 /root/ready.py &
+
+# Install helm
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+
+# Install Consul
+cd /root
+git clone https://github.com/hashicorp/consul-helm.git
+sudo bash -c "cat >/root/helm-consul-values.yaml" <<EOT
+# helm-consul-values.yaml
+global:
+  datacenter: us-dc-1
+
+ui:
+  service:
+    type: 'LoadBalancer'
+
+syncCatalog:
+  enabled: true
+EOT
+helm install -f helm-consul-values.yaml hashicorp ./consul-helm
