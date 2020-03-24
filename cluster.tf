@@ -12,7 +12,7 @@ resource "aws_instance" "k8s-master" {
         Name = "k8s-server-${var.unit_prefix}"
         # TTL = "-1"
         owner = var.owner_email
-        "kubernetes.io/cluster/kubernetes-admin@kubernetes" = "k8s"
+        "kubernetes.io/cluster/javaperks" = "k8s"
     }
 }
 
@@ -33,7 +33,7 @@ resource "aws_instance" "k8s-worker" {
         Name = "k8s-worker-${var.unit_prefix}-${count.index + 1}"
         # TTL = "-1"
         owner = var.owner_email
-        "kubernetes.io/cluster/kubernetes-admin@kubernetes" = "k8s"
+        "kubernetes.io/cluster/javaperks" = "k8s"
     }
 }
 
@@ -41,6 +41,9 @@ resource "aws_security_group" "k8s-node-sg" {
     name = "k8s-node-sg-${var.unit_prefix}"
     description = "webserver security group"
     vpc_id = aws_vpc.primary-vpc.id
+    tags = {
+        "kubernetes.io/cluster/javaperks" = "k8s"
+    }
 
     ingress {
         from_port = 22
@@ -82,6 +85,9 @@ resource "aws_security_group" "k8s-server-sg" {
     name = "k8s-server-sg-${var.unit_prefix}"
     description = "webserver security group"
     vpc_id = aws_vpc.primary-vpc.id
+    tags = {
+        "kubernetes.io/cluster/javaperks" = "k8s"
+    }
 
     ingress {
         from_port = 22

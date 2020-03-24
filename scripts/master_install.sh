@@ -94,65 +94,65 @@ networking:
 scheduler: {}
 EOT
 
-# kubeadm init --config /root/init.yaml > /root/init.txt
+kubeadm init --config /root/init.yaml > /root/init.txt
 
-# mkdir -p $HOME/.kube
-# cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-# chown $(id -u):$(id -g) $HOME/.kube/config
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
 
-# cat /root/init.txt | tail -2 > /root/kubeadm-join.txt
+cat /root/init.txt | tail -2 > /root/kubeadm-join.txt
 
-# export KUBEJOIN="$(cat /root/kubeadm-join.txt | sed -e ':a;N;$!ba;s/ \\\n    / /g')"
-# export KUBECONFIG=/etc/kubernetes/admin.conf
-# echo "export KUBECONFIG=/etc/kubernetes/admin.conf" >> /root/.profile
+export KUBEJOIN="$(cat /root/kubeadm-join.txt | sed -e ':a;N;$!ba;s/ \\\n    / /g')"
+export KUBECONFIG=/etc/kubernetes/admin.conf
+echo "export KUBECONFIG=/etc/kubernetes/admin.conf" >> /root/.profile
 
-# mkdir -p /etc/cni/net.d
-# mkdir -p /opt/cni/bin
-# sysctl net.bridge.bridge-nf-call-iptables=1
-# kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
-# kubectl apply -f "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/storage-class/aws/default.yaml"
+mkdir -p /etc/cni/net.d
+mkdir -p /opt/cni/bin
+sysctl net.bridge.bridge-nf-call-iptables=1
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+kubectl apply -f "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/storage-class/aws/default.yaml"
 
-# while [[ ! -z $(kubectl get pods --all-namespaces | sed -n '1d; /Running/ !p') ]]; do
-#     sleep 5
-# done
+while [[ ! -z $(kubectl get pods --all-namespaces | sed -n '1d; /Running/ !p') ]]; do
+    sleep 5
+done
 
-# sudo bash -c "cat >/root/ready.py" <<EOT
-# from flask import Flask
-# app = Flask(__name__)
+sudo bash -c "cat >/root/ready.py" <<EOT
+from flask import Flask
+app = Flask(__name__)
 
-# @app.route('/')
-# def hello():
-#     return "$KUBEJOIN"
+@app.route('/')
+def hello():
+    return "$KUBEJOIN"
 
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0')
-# EOT
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
+EOT
 
-# python3 /root/ready.py &
+python3 /root/ready.py &
 
-# # Install helm
-# curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-# chmod 700 get_helm.sh
-# ./get_helm.sh
+while [[ ! -z $(kubectl get nodes | sed -n '1d; /NotReady/ p') ]]; do
+    sleep 5
+done
 
-# # Install Consul
-# cd /root
-# git clone https://github.com/hashicorp/consul-helm.git
-# sudo bash -c "cat >/root/helm-consul-values.yaml" <<EOT
-# # helm-consul-values.yaml
-# global:
-#   datacenter: us-dc-1
+# Install helm
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
 
-# ui:
-#   service:
-#     type: 'LoadBalancer'
+# Install Consul
+cd /root
+git clone https://github.com/hashicorp/consul-helm.git
+sudo bash -c "cat >/root/helm-consul-values.yaml" <<EOT
+# helm-consul-values.yaml
+global:
+  datacenter: us-dc-1
 
-# syncCatalog:
-#   enabled: true
+ui:
+  service:
+    type: 'LoadBalancer'
 
-# server:
-#   storage: 10Gi
-#   storageClass: gp2
-# EOT
+syncCatalog:
+  enabled: true
+EOT
 
-# helm install -f helm-consul-values.yaml hashicorp ./consul-helm
+helm install -f helm-consul-values.yaml hashicorp ./consul-helm

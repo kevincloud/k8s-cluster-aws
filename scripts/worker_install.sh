@@ -36,7 +36,6 @@ export CLIENT_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
 export AWS_HOSTNAME=`curl -s http://169.254.169.254/latest/meta-data/local-hostname`
 
 echo $AWS_HOSTNAME > /etc/hostname
-# echo "$CLIENT_IP k8s-master" >> /etc/hosts
 hostnamectl set-hostname $AWS_HOSTNAME
 
 curl -s http://10.0.1.10:5000/ > /root/ready.sh

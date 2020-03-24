@@ -10,6 +10,7 @@ resource "aws_vpc" "primary-vpc" {
 
     tags = {
         Name = "k8s-vpc-${var.unit_prefix}"
+        "kubernetes.io/cluster/javaperks" = "k8s"
     }
 }
 
@@ -18,6 +19,7 @@ resource "aws_internet_gateway" "igw" {
 
     tags = {
         Name = "k8s-igw-${var.unit_prefix}"
+        "kubernetes.io/cluster/javaperks" = "k8s"
     }
 }
 
@@ -30,6 +32,7 @@ resource "aws_subnet" "public-subnet" {
 
     tags = {
         Name = "k8s-public-subnet-1-${var.unit_prefix}"
+        "kubernetes.io/cluster/javaperks" = "k8s"
     }
 }
 
@@ -40,6 +43,7 @@ resource "aws_subnet" "private-subnet" {
 
     tags = {
         Name = "k8s-private-subnet-1-${var.unit_prefix}"
+        "kubernetes.io/cluster/javaperks" = "k8s"
     }
 }
 
@@ -50,7 +54,8 @@ resource "aws_subnet" "private-subnet-2" {
 
     tags = {
         Name = "k8s-private-subnet-2-${var.unit_prefix}"
-    }
+        "kubernetes.io/cluster/javaperks" = "k8s"
+        "kubernetes.io/cluster/javaperks" = "k8s"
 }
 
 resource "aws_route" "public-routes" {
@@ -64,6 +69,7 @@ resource "aws_eip" "nat-ip" {
 
     tags = {
         Name = "k8s-eip-${var.unit_prefix}"
+        "kubernetes.io/cluster/javaperks" = "k8s"
     }
 }
 
@@ -74,6 +80,7 @@ resource "aws_nat_gateway" "natgw" {
 
     tags = {
         Name = "k8s-natgw-${var.unit_prefix}"
+        "kubernetes.io/cluster/javaperks" = "k8s"
     }
 }
 
@@ -86,6 +93,7 @@ resource "aws_route_table" "natgw-route" {
 
     tags = {
         Name = "k8s-natgw-route-${var.unit_prefix}"
+        "kubernetes.io/cluster/javaperks" = "k8s"
     }
 }
 
