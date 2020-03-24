@@ -47,22 +47,58 @@ echo $AWS_HOSTNAME > /etc/hostname
 # echo "$CLIENT_IP k8s-master" >> /etc/hosts
 hostnamectl set-hostname $AWS_HOSTNAME
 
-# kubeadm init --apiserver-advertise-address=$CLIENT_IP > /root/init.txt
+sudo bash -c "cat >>/root/init.yaml" <<EOT
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: InitConfiguration
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: abcdef.0123456789abcdef
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+localAPIEndpoint:
+  advertiseAddress: $CLIENT_IP
+  bindPort: 6443
+nodeRegistration:
+  criSocket: /var/run/dockershim.sock
+  name: $AWS_HOSTNAME
+  taints:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+  kubeletExtraArgs:
+    cloud-provider: aws
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+kubernetesVersion: v1.17.0
+apiServer:
+  timeoutForControlPlane: 4m0s
+  extraArgs:
+    cloud-provider: aws
+certificatesDir: /etc/kubernetes/pki
+clusterName: javaperks
+controllerManager:
+  extraArgs:
+    cloud-provider: aws
+dns:
+  type: CoreDNS
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+imageRepository: k8s.gcr.io
+networking:
+  dnsDomain: cluster.local
+  serviceSubnet: 10.96.0.0/12
+scheduler: {}
+EOT
+
+# kubeadm init --config /root/init.yaml > /root/init.txt
 
 # mkdir -p $HOME/.kube
 # cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 # chown $(id -u):$(id -g) $HOME/.kube/config
-
-# sudo bash -c "cat >>/etc/kubernetes/admin.conf" <<EOT
-# apiServerExtraArgs:
-#   cloud-provider: aws
-# controllerManagerExtraArgs:
-#   cloud-provider: aws
-# nodeRegistration:
-#   name: $AWS_HOSTNAME
-#   kubeletExtraArgs:
-#     cloud-provider: aws
-# EOT
 
 # cat /root/init.txt | tail -2 > /root/kubeadm-join.txt
 
