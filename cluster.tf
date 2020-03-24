@@ -12,6 +12,7 @@ resource "aws_instance" "k8s-master" {
         Name = "k8s-server-${var.unit_prefix}"
         # TTL = "-1"
         owner = var.owner_email
+        "kubernetes.io/cluster/kubernetes-admin@kubernetes" = "k8s"
     }
 }
 
@@ -32,6 +33,7 @@ resource "aws_instance" "k8s-worker" {
         Name = "k8s-worker-${var.unit_prefix}-${count.index + 1}"
         # TTL = "-1"
         owner = var.owner_email
+        "kubernetes.io/cluster/kubernetes-admin@kubernetes" = "k8s"
     }
 }
 
@@ -154,6 +156,9 @@ data "aws_iam_policy_document" "k8s-main-access-doc" {
             "ecr:GetAuthorizationToken",
             "ec2:*",
             "ec2messages:GetMessages",
+            "elasticloadbalancing:*",
+            "autoscaling:DescribeAutoScalingGroup",
+            "autoscaling:UpdateAutoScalingGroup",
             "ssm:UpdateInstanceInformation",
             "ssm:ListInstanceAssociations",
             "ssm:ListAssociations",

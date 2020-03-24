@@ -8,8 +8,8 @@ echo "Pre-installation tasks..."
 echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
 # echo 'grub-pc grub-pc/install_devices_empty boolean true' | sudo debconf-set-selections
 # echo 'grub-pc grub-pc/linux_cmdline seen true' | sudo debconf-set-selections
-# sudo apt-get remove -y grub
-# sudo apt-get install -y grub
+# sudo apt-get remove -y grub-pc
+# sudo apt-get install -y grub-pc
 export DEBIAN_FRONTEND=noninteractive
 echo "...installing Ubuntu updates"
 
@@ -41,10 +41,22 @@ pip3 install Flask
 pip3 install awscli
 
 export CLIENT_IP=`curl -s http://169.254.169.254/latest/meta-data/local-ipv4`
+export AWS_HOSTNAME=`curl -s http://169.254.169.254/latest/meta-data/local-hostname`
 
-echo "k8s-master" > /etc/hostname
-echo "$CLIENT_IP k8s-master" >> /etc/hosts
-hostnamectl set-hostname k8s-master
+echo $AWS_HOSTNAME > /etc/hostname
+# echo "$CLIENT_IP k8s-master" >> /etc/hosts
+hostnamectl set-hostname $AWS_HOSTNAME
+
+sudo bash -c "cat >>/etc/kubernetes/admin.conf" <<EOT
+apiServerExtraArgs:
+  cloud-provider: aws
+controllerManagerExtraArgs:
+  cloud-provider: aws
+nodeRegistration:
+  name: $AWS_HOSTNAME
+  kubeletExtraArgs:
+    cloud-provider: aws
+EOT
 
 kubeadm init --apiserver-advertise-address=$CLIENT_IP > /root/init.txt
 
@@ -62,6 +74,7 @@ mkdir -p /etc/cni/net.d
 mkdir -p /opt/cni/bin
 sysctl net.bridge.bridge-nf-call-iptables=1
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+kubectl apply -f "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/storage-class/aws/default.yaml"
 
 while [[ ! -z $(kubectl get pods --all-namespaces | sed -n '1d; /Running/ !p') ]]; do
     sleep 5
@@ -100,5 +113,9 @@ ui:
 
 syncCatalog:
   enabled: true
+
+server:
+  storage: 10Gi
+  storageClass: gp2
 EOT
 helm install -f helm-consul-values.yaml hashicorp ./consul-helm

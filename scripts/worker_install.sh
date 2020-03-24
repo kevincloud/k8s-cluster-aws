@@ -33,16 +33,11 @@ sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 
 export CLIENT_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
+export AWS_HOSTNAME=`curl -s http://169.254.169.254/latest/meta-data/local-hostname`
 
-echo "k8s-worker-${NODE_ID}" > /etc/hostname
-echo "$CLIENT_IP k8s-worker-${NODE_ID}" >> /etc/hosts
-hostnamectl set-hostname k8s-worker-${NODE_ID}
-
-# mkdir -p $HOME/.kube
-# sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-# sudo chown $(id -u):$(id -g) $HOME/.kube/config
-# export KUBECONFIG=$HOME/.kube/config
-# export KUBECONFIG=$HOME/.kube/config | tee -a ~/.bashrc
+echo $AWS_HOSTNAME > /etc/hostname
+# echo "$CLIENT_IP k8s-master" >> /etc/hosts
+hostnamectl set-hostname $AWS_HOSTNAME
 
 curl -s http://10.0.1.10:5000/ > /root/ready.sh
 while [ ! -s "/root/ready.sh" ]; do
