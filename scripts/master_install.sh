@@ -47,6 +47,12 @@ echo $AWS_HOSTNAME > /etc/hostname
 # echo "$CLIENT_IP k8s-master" >> /etc/hosts
 hostnamectl set-hostname $AWS_HOSTNAME
 
+kubeadm init --apiserver-advertise-address=$CLIENT_IP > /root/init.txt
+
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
+
 sudo bash -c "cat >>/etc/kubernetes/admin.conf" <<EOT
 apiServerExtraArgs:
   cloud-provider: aws
@@ -57,12 +63,6 @@ nodeRegistration:
   kubeletExtraArgs:
     cloud-provider: aws
 EOT
-
-kubeadm init --apiserver-advertise-address=$CLIENT_IP > /root/init.txt
-
-mkdir -p $HOME/.kube
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-chown $(id -u):$(id -g) $HOME/.kube/config
 
 cat /root/init.txt | tail -2 > /root/kubeadm-join.txt
 
@@ -118,4 +118,5 @@ server:
   storage: 10Gi
   storageClass: gp2
 EOT
+
 helm install -f helm-consul-values.yaml hashicorp ./consul-helm
