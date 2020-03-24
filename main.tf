@@ -55,7 +55,7 @@ resource "aws_subnet" "private-subnet-2" {
     tags = {
         Name = "k8s-private-subnet-2-${var.unit_prefix}"
         "kubernetes.io/cluster/javaperks" = "k8s"
-        "kubernetes.io/cluster/javaperks" = "k8s"
+    }
 }
 
 resource "aws_route" "public-routes" {
