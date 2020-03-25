@@ -110,7 +110,8 @@ mkdir -p /etc/cni/net.d
 mkdir -p /opt/cni/bin
 sysctl net.bridge.bridge-nf-call-iptables=1
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
-kubectl apply -f "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/storage-class/aws/default.yaml"
+# kubectl apply -f "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/storage-class/aws/default.yaml"
+kubectl create -f https://raw.githubusercontent.com/kubernetes/csi-api/release-1.13/pkg/crd/manifests/csinodeinfo.yaml
 
 while [[ ! -z $(kubectl get pods --all-namespaces | sed -n '1d; /Running/ !p') ]]; do
     sleep 5
@@ -155,4 +156,4 @@ syncCatalog:
   enabled: true
 EOT
 
-helm install -f helm-consul-values.yaml hashicorp ./consul-helm
+# helm install -f helm-consul-values.yaml hashicorp ./consul-helm
