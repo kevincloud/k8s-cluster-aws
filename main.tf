@@ -36,6 +36,19 @@ resource "aws_subnet" "public-subnet" {
     }
 }
 
+resource "aws_subnet" "public-subnet-2" {
+    vpc_id = aws_vpc.primary-vpc.id
+    cidr_block = "10.0.4.0/24"
+    availability_zone = "${var.aws_region}d"
+    map_public_ip_on_launch = true
+    depends_on = [aws_internet_gateway.igw]
+
+    tags = {
+        Name = "k8s-public-subnet-2-${var.unit_prefix}"
+        "kubernetes.io/cluster/javaperks" = "owned"
+    }
+}
+
 resource "aws_subnet" "private-subnet" {
     vpc_id = aws_vpc.primary-vpc.id
     cidr_block = "10.0.2.0/24"
