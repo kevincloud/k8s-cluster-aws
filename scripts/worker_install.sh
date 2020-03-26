@@ -30,7 +30,7 @@ cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 sudo apt-get update
-sudo apt-get install -y kubelet=1.17.4-00 kubeadm=1.17.4-00 kubectl=1.17.4-00
+sudo apt-get install -y kubelet=1.17.0-00 kubeadm=1.17.0-00 kubectl=1.17.0-00
 
 export CLIENT_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
 export AWS_HOSTNAME=`curl -s http://169.254.169.254/latest/meta-data/local-hostname`
