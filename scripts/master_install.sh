@@ -33,9 +33,9 @@ sudo apt-get install -y \
     python3-pip \
     software-properties-common \
     docker-ce=5:18.09.0~3-0~ubuntu-bionic \
-    kubelet=1.17.0-00 \
-    kubeadm=1.17.0-00 \
-    kubectl=1.17.0-00
+    kubelet \
+    kubeadm \
+    kubectl
 
 pip3 install Flask
 pip3 install awscli
@@ -72,7 +72,6 @@ nodeRegistration:
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
-kubernetesVersion: v1.17.0
 apiServer:
   timeoutForControlPlane: 4m0s
   extraArgs:
