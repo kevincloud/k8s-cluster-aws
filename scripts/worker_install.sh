@@ -32,7 +32,7 @@ EOF
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 
-echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' >> /var/lib/kubelet/kubeadm-flags.env
+echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' > /etc/default/kubelet
 service kubelet stop
 service kubelet start
 

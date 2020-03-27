@@ -37,7 +37,7 @@ sudo apt-get install -y \
     kubeadm \
     kubectl
 
-echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' >> /var/lib/kubelet/kubeadm-flags.env
+echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' > /etc/default/kubelet
 service kubelet stop
 service kubelet start
 
