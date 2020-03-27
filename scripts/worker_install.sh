@@ -32,10 +32,6 @@ EOF
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 
-echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' > /etc/default/kubelet
-service kubelet stop
-service kubelet start
-
 export CLIENT_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
 export AWS_HOSTNAME=`curl -s http://169.254.169.254/latest/meta-data/local-hostname`
 export INSTANCE_ID=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
@@ -53,6 +49,6 @@ done
 chmod +x /root/ready.sh
 . /root/ready.sh
 
-# sleep 15
-
-# kubeadm patch node -p '{"spec":{"providerID":"aws:///us-east-1a/$INSTANCE_ID"}}'
+touch /etc/default/kubelet
+echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' >> /etc/default/kubelet
+service kubelet restart

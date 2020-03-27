@@ -37,10 +37,6 @@ sudo apt-get install -y \
     kubeadm \
     kubectl
 
-echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' > /etc/default/kubelet
-service kubelet stop
-service kubelet start
-
 pip3 install Flask
 pip3 install awscli
 
@@ -96,6 +92,7 @@ scheduler: {}
 EOT
 
 kubeadm init --config /root/init.yaml > /root/init.txt
+# echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' > /etc/default/kubelet
 
 mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
