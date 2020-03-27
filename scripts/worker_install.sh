@@ -25,15 +25,16 @@ sudo add-apt-repository \
 sudo apt-get -y update
 sudo apt-get install -y docker-ce=5:18.09.0~3-0~ubuntu-bionic
 
-export KUBELET_EXTRA_ARGS="--cloud-provider=aws"
-echo 'export KUBELET_EXTRA_ARGS="--cloud-provider=aws"' >> /etc/environment
-
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
+
+echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' >> /var/lib/kubelet/kubeadm-flags.env
+service kubelet stop
+service kubelet start
 
 export CLIENT_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
 export AWS_HOSTNAME=`curl -s http://169.254.169.254/latest/meta-data/local-hostname`

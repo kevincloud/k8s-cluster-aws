@@ -26,9 +26,6 @@ EOF
 sudo apt-get -y update
 # sudo apt-get -y upgrade
 
-export KUBELET_EXTRA_ARGS="--cloud-provider=aws"
-echo 'export KUBELET_EXTRA_ARGS="--cloud-provider=aws"' >> /etc/environment
-
 sudo apt-get install -y \
     apt-transport-https \
     ca-certificates \
@@ -39,6 +36,10 @@ sudo apt-get install -y \
     kubelet \
     kubeadm \
     kubectl
+
+echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' >> /var/lib/kubelet/kubeadm-flags.env
+service kubelet stop
+service kubelet start
 
 pip3 install Flask
 pip3 install awscli
