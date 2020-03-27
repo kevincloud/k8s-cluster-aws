@@ -74,6 +74,41 @@ resource "aws_security_group" "k8s-node-sg" {
     }
 
     ingress {
+        from_port = 8300
+        to_port = 8302
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 8301
+        to_port = 8302
+        protocol = "udp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 8500
+        to_port = 8500
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 8600
+        to_port = 8600
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 8600
+        to_port = 8600
+        protocol = "udp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
         from_port = 10250
         to_port = 10250
         protocol = "tcp"
@@ -148,6 +183,41 @@ resource "aws_security_group" "k8s-server-sg" {
     ingress {
         from_port = 6783
         to_port = 6784
+        protocol = "udp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 8300
+        to_port = 8302
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 8301
+        to_port = 8302
+        protocol = "udp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 8500
+        to_port = 8500
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 8600
+        to_port = 8600
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 8600
+        to_port = 8600
         protocol = "udp"
         cidr_blocks = ["0.0.0.0/0"]
     }
