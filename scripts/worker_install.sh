@@ -47,4 +47,6 @@ done
 chmod +x /root/ready.sh
 . /root/ready.sh
 
+sleep 15
+
 kubeadm patch node -p '{"spec":{"providerID":"aws:///us-east-1a/$INSTANCE_ID"}}'
