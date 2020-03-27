@@ -182,7 +182,7 @@ data "aws_iam_policy_document" "k8s-main-access-doc" {
             "ecr:*",
             "ecr:GetAuthorizationToken",
             "ec2:*",
-            "ec2:DescribeVpcs",
+            "ec2:Describe*",
             "ec2messages:GetMessages",
             "elasticloadbalancing:*",
             "autoscaling:DescribeAutoScalingGroup",
@@ -212,6 +212,17 @@ data "aws_iam_policy_document" "k8s-main-tag-doc" {
     }
 }
 
+data "aws_iam_policy_document" "k8s-main-inst-doc" {
+    statement {
+        effect = "Allow"
+        resources = ["arn:aws:ec2:*:*:instance/*"]
+        actions = [
+            "ec2:AttachVolume",
+            "ec2:DetachVolume"
+        ]
+    }
+}
+
 resource "aws_iam_role" "k8s-main-access-role" {
   name               = "k8s-access-role-${var.unit_prefix}"
   assume_role_policy = data.aws_iam_policy_document.k8s-assume-role.json
@@ -227,6 +238,12 @@ resource "aws_iam_role_policy" "k8s-main-access-policy-2" {
   name   = "k8s-access-policy-${var.unit_prefix}"
   role   = aws_iam_role.k8s-main-access-role.id
   policy = data.aws_iam_policy_document.k8s-main-tag-doc.json
+}
+
+resource "aws_iam_role_policy" "k8s-main-access-policy-3" {
+  name   = "k8s-access-policy-${var.unit_prefix}"
+  role   = aws_iam_role.k8s-main-access-role.id
+  policy = data.aws_iam_policy_document.k8s-main-inst-doc.json
 }
 
 resource "aws_iam_instance_profile" "k8s-main-profile" {
