@@ -26,6 +26,9 @@ EOF
 sudo apt-get -y update
 # sudo apt-get -y upgrade
 
+export KUBELET_EXTRA_ARGS="--cloud-provider=aws"
+echo 'export KUBELET_EXTRA_ARGS="--cloud-provider=aws"' >> /etc/environment
+
 sudo apt-get install -y \
     apt-transport-https \
     ca-certificates \
@@ -67,9 +70,6 @@ nodeRegistration:
   taints:
   - effect: NoSchedule
     key: node-role.kubernetes.io/master
-  kubeletExtraArgs:
-    cloud-provider: aws
-    node-labels: "failure-domain.beta.kubernetes.io/region=us-east-1,failure-domain.beta.kubernetes.io/zone=us-east-1a"
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
