@@ -35,9 +35,13 @@ sudo apt-get install -y kubelet kubeadm kubectl
 export CLIENT_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
 export AWS_HOSTNAME=`curl -s http://169.254.169.254/latest/meta-data/local-hostname`
 export INSTANCE_ID=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
+export KUBELET_EXTRA_ARGS="--cloud-provider=aws"
+echo 'export KUBELET_EXTRA_ARGS="--cloud-provider=aws"' >> /etc/environment
 
 echo $AWS_HOSTNAME > /etc/hostname
 hostnamectl set-hostname $AWS_HOSTNAME
+# export KUBERNETES_MASTER="http://10.0.1.10:8080"
+# echo 'export KUBERNETES_MASTER="http://10.0.1.10:8080"' >> /root/.profile
 
 curl -s http://10.0.1.10:5000/ > /root/ready.sh
 while [ ! -s "/root/ready.sh" ]; do
@@ -47,6 +51,6 @@ done
 chmod +x /root/ready.sh
 . /root/ready.sh
 
-sleep 15
+# sleep 15
 
-kubeadm patch node -p '{"spec":{"providerID":"aws:///us-east-1a/$INSTANCE_ID"}}'
+# kubeadm patch node -p '{"spec":{"providerID":"aws:///us-east-1a/$INSTANCE_ID"}}'
