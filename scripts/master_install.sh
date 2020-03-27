@@ -32,10 +32,36 @@ sudo apt-get install -y \
     curl \
     python3-pip \
     software-properties-common \
-    docker.io \
+    gnupg2
+
+sudo apt-get install -y \
+    containerd.io=1.2.13-1 \
+    docker-ce=5:19.03.8~3-0~ubuntu-$(lsb_release -cs) \
+    docker-ce-cli=5:19.03.8~3-0~ubuntu-$(lsb_release -cs)
+
+sudo apt-get install -y \
     kubelet \
     kubeadm \
     kubectl
+
+# Setup daemon.
+cat > /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
+
+mkdir -p /etc/systemd/system/docker.service.d
+
+# Restart docker.
+systemctl enable docker
+systemctl daemon-reload
+systemctl restart docker
 
 pip3 install Flask
 pip3 install awscli
@@ -92,7 +118,8 @@ scheduler: {}
 EOT
 
 kubeadm init --config /root/init.yaml > /root/init.txt
-# echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' > /etc/default/kubelet
+echo 'KUBELET_EXTRA_ARGS="--cloud-provider=aws"' > /etc/default/kubelet
+service kubelet restart
 
 mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
