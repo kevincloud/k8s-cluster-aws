@@ -172,7 +172,7 @@ data "aws_iam_policy_document" "k8s-assume-role" {
   }
 }
 
-data "aws_iam_policy_document" "k8s-main-access-doc" {
+data "aws_iam_policy_document" "k8s-main-access-doc-data" {
     statement {
         sid       = "FullAccess"
         effect    = "Allow"
@@ -202,7 +202,7 @@ data "aws_iam_policy_document" "k8s-main-access-doc" {
     }
 }
 
-data "aws_iam_policy_document" "k8s-main-tag-doc" {
+data "aws_iam_policy_document" "k8s-main-tag-doc-data" {
     statement {
         effect = "Allow"
         resources = ["arn:aws:ec2:*:*:network-interface/*"]
@@ -212,7 +212,7 @@ data "aws_iam_policy_document" "k8s-main-tag-doc" {
     }
 }
 
-data "aws_iam_policy_document" "k8s-main-inst-doc" {
+data "aws_iam_policy_document" "k8s-main-inst-doc-data" {
     statement {
         effect = "Allow"
         resources = ["arn:aws:ec2:*:*:instance/*"]
@@ -223,27 +223,42 @@ data "aws_iam_policy_document" "k8s-main-inst-doc" {
     }
 }
 
+resource "aws_iam_policy" "k8s-main-access-doc" {
+    name = "k8s-access-policy-${var.unit_prefix}"
+    policy = data.aws_iam_policy_document.k8s-main-access-doc-data.json
+}
+
+resource "aws_iam_policy" "k8s-main-tag-doc" {
+    name = "k8s-tag-policy-${var.unit_prefix}"
+    policy = data.aws_iam_policy_document.k8s-main-tag-doc-data.json
+}
+
+resource "aws_iam_policy" "k8s-main-inst-doc" {
+    name = "k8s-inst-policy-${var.unit_prefix}"
+    policy = data.aws_iam_policy_document.k8s-main-inst-doc-data.json
+}
+
 resource "aws_iam_role" "k8s-main-access-role" {
   name               = "k8s-access-role-${var.unit_prefix}"
   assume_role_policy = data.aws_iam_policy_document.k8s-assume-role.json
 }
 
-resource "aws_iam_role_policy" "k8s-main-access-policy-1" {
+resource "aws_iam_role_policy_attachment" "k8s-main-access-policy-1" {
   name   = "k8s-access-policy-${var.unit_prefix}"
   role   = aws_iam_role.k8s-main-access-role.id
-  policy = data.aws_iam_policy_document.k8s-main-access-doc.json
+  policy_arn = aws_iam_policy.k8s-main-access-doc.arn
 }
 
-resource "aws_iam_role_policy" "k8s-main-access-policy-2" {
+resource "aws_iam_role_policy_attachment" "k8s-main-access-policy-2" {
   name   = "k8s-access-policy-${var.unit_prefix}"
   role   = aws_iam_role.k8s-main-access-role.id
-  policy = data.aws_iam_policy_document.k8s-main-tag-doc.json
+  policy_arn = aws_iam_policy.k8s-main-tag-doc.arn
 }
 
-resource "aws_iam_role_policy" "k8s-main-access-policy-3" {
+resource "aws_iam_role_policy_attachment" "k8s-main-access-policy-3" {
   name   = "k8s-access-policy-${var.unit_prefix}"
   role   = aws_iam_role.k8s-main-access-role.id
-  policy = data.aws_iam_policy_document.k8s-main-inst-doc.json
+  policy_arn = aws_iam_policy.k8s-main-inst-doc.arn
 }
 
 resource "aws_iam_instance_profile" "k8s-main-profile" {
