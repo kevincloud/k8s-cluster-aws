@@ -244,19 +244,16 @@ resource "aws_iam_role" "k8s-main-access-role" {
 }
 
 resource "aws_iam_role_policy_attachment" "k8s-main-access-policy-1" {
-  name   = "k8s-access-policy-${var.unit_prefix}"
   role   = aws_iam_role.k8s-main-access-role.id
   policy_arn = aws_iam_policy.k8s-main-access-doc.arn
 }
 
 resource "aws_iam_role_policy_attachment" "k8s-main-access-policy-2" {
-  name   = "k8s-access-policy-${var.unit_prefix}"
   role   = aws_iam_role.k8s-main-access-role.id
   policy_arn = aws_iam_policy.k8s-main-tag-doc.arn
 }
 
 resource "aws_iam_role_policy_attachment" "k8s-main-access-policy-3" {
-  name   = "k8s-access-policy-${var.unit_prefix}"
   role   = aws_iam_role.k8s-main-access-role.id
   policy_arn = aws_iam_policy.k8s-main-inst-doc.arn
 }
