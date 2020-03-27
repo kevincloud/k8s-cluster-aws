@@ -32,7 +32,7 @@ sudo apt-get install -y \
     curl \
     python3-pip \
     software-properties-common \
-    docker-ce=5:18.09.0~3-0~ubuntu-bionic \
+    docker.io \
     kubelet \
     kubeadm \
     kubectl

@@ -23,7 +23,7 @@ sudo add-apt-repository \
     $(lsb_release -cs) \
     stable"
 sudo apt-get -y update
-sudo apt-get install -y docker-ce=5:18.09.0~3-0~ubuntu-bionic
+sudo apt-get install -y docker.io
 
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
