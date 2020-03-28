@@ -4,7 +4,7 @@ resource "aws_instance" "k8s-master" {
     key_name = var.key_pair
     vpc_security_group_ids = [aws_security_group.k8s-server-sg.id]
     user_data = templatefile("${path.module}/scripts/master_install.sh", {})
-    subnet_id = aws_subnet.public-subnet.id
+    subnet_id = aws_subnet.public-subnet-1.id
     iam_instance_profile = aws_iam_instance_profile.k8s-main-profile.id
     private_ip = "10.0.1.10"
 

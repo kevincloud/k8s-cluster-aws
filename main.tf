@@ -57,7 +57,7 @@ resource "aws_subnet" "public-subnet-3" {
     depends_on = [aws_internet_gateway.igw]
 
     tags = {
-        Name = "k8s-private-subnet-1-${var.unit_prefix}"
+        Name = "k8s-private-subnet-3-${var.unit_prefix}"
         "kubernetes.io/cluster/javaperks" = "owned"
     }
 }
@@ -79,7 +79,7 @@ resource "aws_eip" "nat-ip" {
 
 resource "aws_nat_gateway" "natgw" {
     allocation_id   = aws_eip.nat-ip.id
-    subnet_id       = aws_subnet.public-subnet.id
+    subnet_id       = aws_subnet.public-subnet-1.id
     depends_on      = [aws_internet_gateway.igw, aws_subnet.public-subnet]
 
     tags = {
@@ -101,8 +101,13 @@ resource "aws_route_table" "natgw-route" {
     }
 }
 
-resource "aws_route_table_association" "route-out" {
-    subnet_id = aws_subnet.private-subnet.id
+resource "aws_route_table_association" "route-out-ps2" {
+    subnet_id = aws_subnet.public-subnet-2.id
+    route_table_id = aws_route_table.natgw-route.id
+}
+
+resource "aws_route_table_association" "route-out-ps3" {
+    subnet_id = aws_subnet.public-subnet-3.id
     route_table_id = aws_route_table.natgw-route.id
 }
 
