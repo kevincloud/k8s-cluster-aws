@@ -27,7 +27,7 @@ resource "aws_instance" "k8s-worker" {
     })
     subnet_id = aws_subnet.public-subnet[count.index%length(var.aws_azs)].id
     iam_instance_profile = aws_iam_instance_profile.k8s-main-profile.id
-    private_ip = "10.0.1.${count.index + 100}"
+    private_ip = "10.0.${count.index%length(var.aws_azs)+1}.${count.index + 100}"
 
     tags = {
         Name = "k8s-worker-${var.unit_prefix}-${count.index + 1}"
