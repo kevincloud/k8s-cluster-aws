@@ -80,7 +80,7 @@ resource "aws_eip" "nat-ip" {
 resource "aws_nat_gateway" "natgw" {
     allocation_id   = aws_eip.nat-ip.id
     subnet_id       = aws_subnet.public-subnet-1.id
-    depends_on      = [aws_internet_gateway.igw, aws_subnet.public-subnet]
+    depends_on      = [aws_internet_gateway.igw, aws_subnet.public-subnet-1]
 
     tags = {
         Name = "k8s-natgw-${var.unit_prefix}"
