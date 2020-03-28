@@ -30,7 +30,7 @@ resource "aws_instance" "k8s-worker" {
     user_data = templatefile("${path.module}/scripts/worker_install.sh", {
         NODE_ID = count.index + 1
     })
-    subnet_id = "aws_subnet.public-subnet-${(count.index%length(var.aws_azs))+1}.id"
+    subnet_id = aws_subnet.public-subnet-${(count.index%length(var.aws_azs))+1}.id
     iam_instance_profile = aws_iam_instance_profile.k8s-main-profile.id
     private_ip = "10.0.1.${count.index + 100}"
     depends_on      = [
