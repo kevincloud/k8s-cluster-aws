@@ -23,7 +23,7 @@ resource "aws_internet_gateway" "igw" {
     }
 }
 
-resource "aws_subnet" "public-subnet" {
+resource "aws_subnet" "public-subnet-1" {
     vpc_id = aws_vpc.primary-vpc.id
     cidr_block = "10.0.1.0/24"
     availability_zone = "${var.aws_region}a"
@@ -38,8 +38,8 @@ resource "aws_subnet" "public-subnet" {
 
 resource "aws_subnet" "public-subnet-2" {
     vpc_id = aws_vpc.primary-vpc.id
-    cidr_block = "10.0.4.0/24"
-    availability_zone = "${var.aws_region}d"
+    cidr_block = "10.0.2.0/24"
+    availability_zone = "${var.aws_region}b"
     map_public_ip_on_launch = true
     depends_on = [aws_internet_gateway.igw]
 
@@ -49,24 +49,15 @@ resource "aws_subnet" "public-subnet-2" {
     }
 }
 
-resource "aws_subnet" "private-subnet" {
-    vpc_id = aws_vpc.primary-vpc.id
-    cidr_block = "10.0.2.0/24"
-    availability_zone = "${var.aws_region}b"
-
-    tags = {
-        Name = "k8s-private-subnet-1-${var.unit_prefix}"
-        "kubernetes.io/cluster/javaperks" = "owned"
-    }
-}
-
-resource "aws_subnet" "private-subnet-2" {
+resource "aws_subnet" "public-subnet-3" {
     vpc_id = aws_vpc.primary-vpc.id
     cidr_block = "10.0.3.0/24"
     availability_zone = "${var.aws_region}c"
+    map_public_ip_on_launch = true
+    depends_on = [aws_internet_gateway.igw]
 
     tags = {
-        Name = "k8s-private-subnet-2-${var.unit_prefix}"
+        Name = "k8s-private-subnet-1-${var.unit_prefix}"
         "kubernetes.io/cluster/javaperks" = "owned"
     }
 }

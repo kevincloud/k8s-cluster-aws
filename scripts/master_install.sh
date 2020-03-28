@@ -163,9 +163,6 @@ while [[ ! -z $(kubectl get nodes | sed -n '1d; /NotReady/ p') ]]; do
     sleep 5
 done
 
-# kubectl label node failure-domain.beta.kubernetes.io/region=us-east-1 --all
-# kubectl label node failure-domain.beta.kubernetes.io/zone=us-east-1a --all
-
 # Install helm
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
 chmod 700 get_helm.sh
@@ -182,7 +179,10 @@ global:
 ui:
   service:
     type: 'LoadBalancer'
+
+syncCatalog:
+  enable: true
 EOT
 
-# helm install -f helm-consul-values.yaml hashicorp ./consul-helm
+helm install -f helm-consul-values.yaml hashicorp ./consul-helm
 
