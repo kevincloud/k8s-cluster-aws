@@ -6,6 +6,11 @@ resource "aws_instance" "k8s-master" {
     user_data = templatefile("${path.module}/scripts/master_install.sh", {})
     subnet_id = aws_subnet.public-subnet-1.id
     iam_instance_profile = aws_iam_instance_profile.k8s-main-profile.id
+    depends_on      = [
+        aws_subnet.public-subnet-1,
+        aws_subnet.public-subnet-2,
+        aws_subnet.public-subnet-3
+    ]
     private_ip = "10.0.1.10"
 
     tags = {
@@ -28,6 +33,11 @@ resource "aws_instance" "k8s-worker" {
     subnet_id = "aws_subnet.public-subnet-${(count.index%length(var.aws_azs))+1}.id"
     iam_instance_profile = aws_iam_instance_profile.k8s-main-profile.id
     private_ip = "10.0.1.${count.index + 100}"
+    depends_on      = [
+        aws_subnet.public-subnet-1,
+        aws_subnet.public-subnet-2,
+        aws_subnet.public-subnet-3
+    ]
 
     tags = {
         Name = "k8s-worker-${var.unit_prefix}-${count.index + 1}"
