@@ -64,7 +64,6 @@ resource "aws_nat_gateway" "natgw" {
 }
 
 resource "aws_route_table" "igw-route" {
-    count = length(var.aws_azs)
     vpc_id = aws_vpc.primary-vpc.id
     route {
         cidr_block = "0.0.0.0/0"
@@ -72,14 +71,14 @@ resource "aws_route_table" "igw-route" {
     }
 
     tags = {
-        Name = "k8s-igw-route-${var.unit_prefix}-${count.index+1}"
+        Name = "k8s-igw-route-${var.unit_prefix}"
         "kubernetes.io/cluster/javaperks" = "owned"
     }
 }
 
 resource "aws_route_table_association" "route-out" {
     count = 3
-    route_table_id = aws_route_table.igw-route[count.index].id
+    route_table_id = aws_route_table.igw-route.id
     subnet_id      = aws_subnet.public-subnet[count.index].id
 }
 
