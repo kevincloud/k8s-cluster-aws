@@ -63,56 +63,56 @@ resource "aws_security_group" "k8s-node-sg" {
         from_port = 6781
         to_port = 6784
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 6783
         to_port = 6784
         protocol = "udp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 8300
         to_port = 8302
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 8301
         to_port = 8302
         protocol = "udp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 8500
         to_port = 8500
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 8600
         to_port = 8600
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 8600
         to_port = 8600
         protocol = "udp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 10250
         to_port = 10250
         protocol = "tcp"
-        cidr_blocks = ["10.0.1.0/24"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
@@ -156,84 +156,84 @@ resource "aws_security_group" "k8s-server-sg" {
         from_port = 2379
         to_port = 2380
         protocol = "tcp"
-        cidr_blocks = ["10.0.1.0/24"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 5000
         to_port = 5000
         protocol = "tcp"
-        cidr_blocks = ["10.0.1.0/24"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 6443
         to_port = 6443
         protocol = "tcp"
-        cidr_blocks = ["10.0.1.0/24"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 6781
         to_port = 6784
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 6783
         to_port = 6784
         protocol = "udp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 8300
         to_port = 8302
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 8301
         to_port = 8302
         protocol = "udp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 8500
         to_port = 8500
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 8600
         to_port = 8600
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 8600
         to_port = 8600
         protocol = "udp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 10250
         to_port = 10252
         protocol = "tcp"
-        cidr_blocks = ["10.0.1.0/24"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     ingress {
         from_port = 10255
         to_port = 10255
         protocol = "tcp"
-        cidr_blocks = ["10.0.1.0/24"]
+        cidr_blocks = ["10.0.0.0/16"]
     }
 
     egress {
