@@ -199,12 +199,18 @@ while [[ ! -z $(kubectl get pods --all-namespaces | sed -n '1d; /Running/ !p') ]
     sleep 5
 done
 
+touch /root/patchnodes.sh
 sudo bash -c "cat >/root/ready.py" <<EOT
 from flask import Flask
 app = Flask(__name__)
 
 @app.route('/')
 def hello():
+    az = request.args.get("az")
+    id = request.args.get("id")
+    host = request.args.get("host")
+    file = open("/root/patchnodes.sh", "w")
+    file.write("kubectl patch node "+host+" -p '{\"spec\":{\"providerID\":\"aws:///"+az+"/"+id+"\"}}'")
     return "$KUBEJOIN"
 
 if __name__ == '__main__':
@@ -216,6 +222,9 @@ python3 /root/ready.py &
 while [[ ! -z $(kubectl get nodes | sed -n '1d; /NotReady/ p') ]]; do
     sleep 5
 done
+
+chmod +x /root/patchnodes.sh
+/root/patchnodes.sh
 
 # Install helm
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
@@ -238,5 +247,4 @@ syncCatalog:
   enabled: true
 EOT
 
-helm install -f helm-consul-values.yaml hashicorp ./consul-helm
-
+# helm install -f helm-consul-values.yaml hashicorp ./consul-helm
