@@ -202,15 +202,18 @@ done
 touch /root/patchnodes.sh
 sudo bash -c "cat >/root/ready.py" <<EOT
 from flask import Flask
+from flask import request
+
 app = Flask(__name__)
 
 @app.route('/')
 def hello():
     az = request.args.get("az")
-    id = request.args.get("id")
+    iid = request.args.get("id")
     host = request.args.get("host")
-    file = open("/root/patchnodes.sh", "w")
-    file.write("kubectl patch node "+host+" -p '{\"spec\":{\"providerID\":\"aws:///"+az+"/"+id+"\"}}'")
+    f = open("/root/patchnodes.sh", "a")
+    f.write("kubectl patch node "+host+" -p '{\"spec\":{\"providerID\":\"aws:///"+az+"/"+iid+"\"}}'")
+    f.close()
     return "$KUBEJOIN"
 
 if __name__ == '__main__':
@@ -224,7 +227,8 @@ while [[ ! -z $(kubectl get nodes | sed -n '1d; /NotReady/ p') ]]; do
 done
 
 chmod +x /root/patchnodes.sh
-/root/patchnodes.sh
+# /root/patchnodes.sh
+sleep 60
 
 # Install helm
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
