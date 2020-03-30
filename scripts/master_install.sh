@@ -73,6 +73,59 @@ echo $AWS_HOSTNAME > /etc/hostname
 # echo "$CLIENT_IP k8s-master" >> /etc/hosts
 hostnamectl set-hostname $AWS_HOSTNAME
 
+sudo bash -c "cat >>/root/controller.yaml" <<EOT
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cloud-controller-manager
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: system:cloud-controller-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: cloud-controller-manager
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    k8s-app: cloud-controller-manager
+  name: cloud-controller-manager
+  namespace: kube-system
+spec:
+  selector:
+   matchLabels:
+    k8s-app: cloud-controller-manager
+  template:
+    metadata:
+      labels:
+        k8s-app: cloud-controller-manager
+    spec:
+      serviceAccountName: cloud-controller-manager
+      containers:
+      - name: cloud-controller-manager
+        image: jubican/aws-cloud-controller-manager:1.0.0
+        command:
+        - /bin/aws-cloud-controller-manager
+        - --leader-elect=true
+      tolerations:
+      - key: node.cloudprovider.kubernetes.io/uninitialized
+        value: "true"
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+EOT
+
 sudo bash -c "cat >>/root/init.yaml" <<EOT
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: InitConfiguration
@@ -90,6 +143,8 @@ localAPIEndpoint:
 nodeRegistration:
   criSocket: /var/run/dockershim.sock
   name: $AWS_HOSTNAME
+  kubeletExtraArgs:
+    cloud-provider: aws
   taints:
   - effect: NoSchedule
     key: node-role.kubernetes.io/master
@@ -138,8 +193,7 @@ mkdir -p /opt/cni/bin
 sysctl net.bridge.bridge-nf-call-iptables=1
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 kubectl apply -f "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/storage-class/aws/default.yaml"
-# kubectl create -f https://raw.githubusercontent.com/kubernetes/csi-api/release-1.13/pkg/crd/manifests/csinodeinfo.yaml
-# kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
+kubectl apply -f /root/controller.yaml
 
 while [[ ! -z $(kubectl get pods --all-namespaces | sed -n '1d; /Running/ !p') ]]; do
     sleep 5
@@ -181,7 +235,7 @@ ui:
     type: 'LoadBalancer'
 
 syncCatalog:
-  enable: true
+  enabled: true
 EOT
 
 helm install -f helm-consul-values.yaml hashicorp ./consul-helm
