@@ -212,7 +212,7 @@ def hello():
     iid = request.args.get("id")
     host = request.args.get("host")
     f = open("/root/patchnodes.sh", "a")
-    f.write("kubectl patch node "+host+" -p '{\"spec\":{\"providerID\":\"aws:///"+az+"/"+iid+"\"}}'")
+    f.write("kubectl patch node "+host+" -p '{\"spec\":{\"providerID\":\"aws:///"+az+"/"+iid+"\"}}'\n")
     f.close()
     return "$KUBEJOIN"
 
@@ -226,9 +226,9 @@ while [[ ! -z $(kubectl get nodes | sed -n '1d; /NotReady/ p') ]]; do
     sleep 5
 done
 
+sleep 30
 chmod +x /root/patchnodes.sh
-# /root/patchnodes.sh
-sleep 60
+/root/patchnodes.sh
 
 # Install helm
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
@@ -251,4 +251,4 @@ syncCatalog:
   enabled: true
 EOT
 
-# helm install -f helm-consul-values.yaml hashicorp ./consul-helm
+helm install -f helm-consul-values.yaml hashicorp ./consul-helm
