@@ -8,3 +8,4 @@
 # .tfvars files
 *.tfvars
 *.tfvars.sh
+**/scripts/older/*

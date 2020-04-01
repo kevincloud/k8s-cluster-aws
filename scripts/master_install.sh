@@ -251,4 +251,47 @@ syncCatalog:
   enabled: true
 EOT
 
-helm install -f helm-consul-values.yaml hashicorp ./consul-helm
+helm install -f helm-consul-values.yaml hc-consul ./consul-helm
+
+# Install Vault
+cd /root
+git clone https://github.com/hashicorp/vault-helm.git
+sudo bash -c "cat >/root/helm-vault-values.yaml" <<EOT
+# helm-vault-values.yaml
+server:
+  standalone:
+    enabled: true
+    config: |
+      ui = true
+
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+      storage "file" {
+        path = "/vault/data"
+      }
+      seal "awskms" {
+        region = "us-east-1"
+        kms_key_id = ""
+      }
+  service:
+    enabled: true
+  dataStorage:
+    enabled: true
+    size: 10Gi
+    storageClass: null
+    accessMode: ReadWriteOnce
+ui:
+  enabled: true
+  serviceType: LoadBalancer
+EOT
+
+helm install -f helm-vault-values.yaml hc-vault ./vault-helm
+
+while [[ ! -z $(kubectl get pod hc-vault-0  | sed -n '1d; /Running/ !p') ]]; do
+    sleep 2
+done
+
+kubectl exec hc-vault-0 -- /bin/vault operator init > /root/vault-init.txt
