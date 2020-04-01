@@ -17,6 +17,7 @@ What you'll need is an AWS **access key** and **secret key**, and the rest of th
 * `aws_access_key`: Your AWS Access Key ID
 * `aws_secret_key`: Your AWS Secret Key
 * `aws_region`: The AWS region to run this demo in. Defaults to **us-east-1**
+* `aws_azs`: Availability zones for the worker nodes. Defaults to **us-east-1a**, **us-east-1b**, and **us-east-1c**
 * `key_pair`: Your SSH key pair name in order to login to the instances
 * `unit_prefix`: A unique name to prefix resource names with. This is to avoid name collisions
 * `instance_size`: Size of the instance for the machines in your cluster. Defaults to **t3.micro**
